@@ -796,3 +796,25 @@ main .link-underline:hover,
     animation: none;
   }
 }
+/* Competency Reference Figure */
+.competency-figure {
+  margin: 24px 0;
+  padding: 16px;
+  background-color: var(--surface-color, #17251f);
+  border: 1px solid rgba(242, 169, 59, 0.25);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.competency-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 12px;
+  border-radius: 8px;
+}
+
+.competency-figure figcaption {
+  font-size: 0.9rem;
+  color: var(--default-color, #d3dbd6);
+}
