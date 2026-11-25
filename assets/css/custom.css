@@ -858,3 +858,124 @@ main .link-underline:hover,
     animation: none;
   }
 }
+.contact-module .contact-form {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.2rem 2.4rem;
+  background-color: #17251f;
+  border: 1px solid rgba(242, 169, 59, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+}
+
+.contact-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 1.4rem;
+}
+
+.contact-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.contact-form .form-group.full {
+  grid-column: 1 / -1;
+}
+
+.contact-form .form-heading {
+  grid-column: 1 / -1;
+  margin: 0.8rem 0 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f2a93b;
+}
+
+.contact-form label {
+  font-weight: 600;
+  color: #f4efe6;
+}
+
+.contact-form input {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #f4efe6;
+  background-color: #101a17;
+  border: 1px solid rgba(159, 199, 182, 0.5);
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form input::placeholder {
+  color: #7f9a8e;
+}
+
+.contact-form input:focus {
+  outline: none;
+  border-color: #f2a93b;
+  box-shadow: 0 0 0 3px rgba(242, 169, 59, 0.25);
+}
+
+.contact-form input.is-invalid {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.contact-form .field-error {
+  min-height: 1.2rem;
+  font-size: 0.88rem;
+  color: #ff8a8a;
+}
+
+.contact-form .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.contact-form .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.contact-module .form-result {
+  max-width: 900px;
+  margin: 1.8rem auto 0;
+  padding: 1.6rem 2rem;
+  background-color: #17251f;
+  border: 1px solid rgba(242, 169, 59, 0.3);
+  border-left: 5px solid #f2a93b;
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+}
+
+.form-result h3 {
+  margin: 0 0 1rem;
+}
+
+.form-result .result-line {
+  padding: 0.45rem 0.8rem;
+  margin-bottom: 0.3rem;
+  color: #f4efe6;
+  background-color: rgba(159, 199, 182, 0.12);
+  border-radius: 6px;
+}
+
+.form-result .result-average {
+  margin-top: 0.8rem;
+  font-weight: 700;
+  color: #101a17;
+  background-color: #f2a93b;
+}
+
+@media (max-width: 768px) {
+  .contact-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-module .contact-form {
+    padding: 1.6rem 1.2rem;
+  }
+}
