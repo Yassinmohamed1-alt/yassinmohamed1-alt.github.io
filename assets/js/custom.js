@@ -251,3 +251,249 @@ document.addEventListener("DOMContentLoaded", function () {
 
   submitButton.disabled = true;
 });
+document.addEventListener("DOMContentLoaded", function () {
+  const board = document.getElementById("kanbanBoard");
+
+  if (!board) {
+    return;
+  }
+
+  const STORAGE_KEY = "cvSkillStatuses";
+  const STATUSES = ["Planned", "In Progress", "Completed"];
+
+  const columns = {
+    "Planned": { list: "listPlanned", count: "countPlanned", badge: "status-planned" },
+    "In Progress": { list: "listInProgress", count: "countInProgress", badge: "status-progress" },
+    "Completed": { list: "listCompleted", count: "countCompleted", badge: "status-completed" }
+  };
+
+  const levels = [
+    { level: 1, min: 0, next: 50, rank: "Beginner" },
+    { level: 2, min: 50, next: 150, rank: "Trainee" },
+    { level: 3, min: 150, next: 300, rank: "Specialist" },
+    { level: 4, min: 300, next: null, rank: "Professional" }
+  ];
+
+  const defaultSkills = [
+    { name: "Accessibility", icon: "bi-eye", status: "Planned", xp: 45 },
+    { name: "Web APIs", icon: "bi-globe", status: "Planned", xp: 30 },
+    { name: "JavaScript Basics", icon: "bi-braces", status: "In Progress", xp: 70 },
+    { name: "Responsive Design", icon: "bi-phone", status: "In Progress", xp: 55 },
+    { name: "Bootstrap", icon: "bi-bootstrap", status: "In Progress", xp: 40 },
+    { name: "HTML Structure", icon: "bi-code-slash", status: "Completed", xp: 60 },
+    { name: "CSS Layout", icon: "bi-palette", status: "Completed", xp: 70 },
+    { name: "Git and GitHub", icon: "bi-github", status: "Completed", xp: 50 }
+  ];
+
+  function loadSkills() {
+    const skills = defaultSkills.map(function (skill) {
+      return Object.assign({}, skill);
+    });
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+
+      if (!raw) {
+        return skills;
+      }
+
+      const saved = JSON.parse(raw);
+
+      if (!saved || typeof saved !== "object") {
+        return skills;
+      }
+
+      skills.forEach(function (skill) {
+        if (STATUSES.includes(saved[skill.name])) {
+          skill.status = saved[skill.name];
+        }
+      });
+    } catch (error) {
+      return defaultSkills.map(function (skill) {
+        return Object.assign({}, skill);
+      });
+    }
+
+    return skills;
+  }
+
+  function saveSkills(skills) {
+    const saved = {};
+
+    skills.forEach(function (skill) {
+      saved[skill.name] = skill.status;
+    });
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    } catch (error) {
+      console.warn("Skill statuses could not be saved.");
+    }
+  }
+
+  let skills = loadSkills();
+
+  function getCompletedXp() {
+    return skills.reduce(function (sum, skill) {
+      return skill.status === "Completed" ? sum + skill.xp : sum;
+    }, 0);
+  }
+
+  function getLevelInfo(xp) {
+    let current = levels[0];
+
+    levels.forEach(function (item) {
+      if (xp >= item.min) {
+        current = item;
+      }
+    });
+
+    return current;
+  }
+
+  function createCard(skill) {
+    const card = document.createElement("article");
+    card.className = "kanban-card";
+
+    const top = document.createElement("div");
+    top.className = "kanban-card-top";
+
+    const icon = document.createElement("i");
+    icon.className = "bi " + skill.icon;
+
+    const title = document.createElement("h5");
+    title.textContent = skill.name;
+
+    top.appendChild(icon);
+    top.appendChild(title);
+
+    const bottom = document.createElement("div");
+    bottom.className = "kanban-card-bottom";
+
+    const badge = document.createElement("span");
+    badge.className = "status-badge " + columns[skill.status].badge;
+    badge.textContent = skill.status;
+
+    const xpBadge = document.createElement("span");
+    xpBadge.className = "xp-badge";
+    xpBadge.textContent = skill.xp + " XP";
+
+    bottom.appendChild(badge);
+    bottom.appendChild(xpBadge);
+
+    const select = document.createElement("select");
+    select.className = "status-select";
+    select.setAttribute("aria-label", "Change status of " + skill.name);
+    select.dataset.skill = skill.name;
+
+    STATUSES.forEach(function (status) {
+      const option = document.createElement("option");
+      option.value = status;
+      option.textContent = status;
+      option.selected = status === skill.status;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", function () {
+      changeStatus(skill.name, select.value);
+    });
+
+    card.appendChild(top);
+    card.appendChild(bottom);
+    card.appendChild(select);
+
+    return card;
+  }
+
+  function renderBoard() {
+    const counts = { "Planned": 0, "In Progress": 0, "Completed": 0 };
+
+    STATUSES.forEach(function (status) {
+      document.getElementById(columns[status].list).textContent = "";
+    });
+
+    skills.forEach(function (skill) {
+      document.getElementById(columns[skill.status].list).appendChild(createCard(skill));
+      counts[skill.status] += 1;
+    });
+
+    STATUSES.forEach(function (status) {
+      const total = counts[status];
+      document.getElementById(columns[status].count).textContent = total + (total === 1 ? " skill" : " skills");
+    });
+  }
+
+  function updateSummary(xp, info) {
+    document.getElementById("totalXp").textContent = xp + " XP";
+    document.getElementById("levelValue").textContent = "Level " + info.level;
+    document.getElementById("rankValue").textContent = info.rank;
+  }
+
+  function updateProgressBar(xp, info) {
+    const fill = document.getElementById("xpFill");
+    const track = document.getElementById("xpTrack");
+    const text = document.getElementById("xpProgressText");
+    const scaleStart = document.getElementById("xpScaleStart");
+    const scaleEnd = document.getElementById("xpScaleEnd");
+
+    let percent = 100;
+
+    if (info.next === null) {
+      text.textContent = "100% (maximum level reached)";
+      scaleStart.textContent = "Level " + info.level + ": " + info.min + " XP";
+      scaleEnd.textContent = "Maximum level";
+    } else {
+      percent = Math.round(((xp - info.min) / (info.next - info.min)) * 100);
+      text.textContent = percent + "% (" + xp + " / " + info.next + " XP)";
+      scaleStart.textContent = "Level " + info.level + ": " + info.min + " XP";
+      scaleEnd.textContent = "Level " + (info.level + 1) + ": " + info.next + " XP";
+    }
+
+    fill.style.width = percent + "%";
+    track.setAttribute("aria-valuenow", String(percent));
+  }
+
+  function updateStatistics() {
+    const total = skills.length;
+    const completed = skills.filter(function (skill) {
+      return skill.status === "Completed";
+    }).length;
+    const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    document.getElementById("statTotal").textContent = String(total);
+    document.getElementById("statCompleted").textContent = String(completed);
+    document.getElementById("statRate").textContent = rate + "%";
+  }
+
+  function updateModule() {
+    const xp = getCompletedXp();
+    const info = getLevelInfo(xp);
+
+    renderBoard();
+    updateSummary(xp, info);
+    updateProgressBar(xp, info);
+    updateStatistics();
+  }
+
+  function changeStatus(name, status) {
+    const skill = skills.find(function (item) {
+      return item.name === name;
+    });
+
+    if (!skill || !STATUSES.includes(status)) {
+      return;
+    }
+
+    skill.status = status;
+    saveSkills(skills);
+    updateModule();
+
+    const select = board.querySelector('select[data-skill="' + CSS.escape(name) + '"]');
+
+    if (select) {
+      select.focus();
+    }
+  }
+
+  updateModule();
+});

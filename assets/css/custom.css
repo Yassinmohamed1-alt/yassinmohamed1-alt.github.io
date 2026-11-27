@@ -979,3 +979,30 @@ main .link-underline:hover,
     padding: 1.6rem 1.2rem;
   }
 }
+.competency .status-select {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: "Source Sans 3", sans-serif;
+  color: #f4efe6;
+  background-color: #17251f;
+  border: 1px solid rgba(159, 199, 182, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.competency .status-select:hover {
+  border-color: #f2a93b;
+}
+
+.competency .status-select:focus {
+  outline: none;
+  border-color: #f2a93b;
+  box-shadow: 0 0 0 3px rgba(242, 169, 59, 0.25);
+}
+
+.competency .status-select option {
+  color: #f4efe6;
+  background-color: #17251f;
+}
